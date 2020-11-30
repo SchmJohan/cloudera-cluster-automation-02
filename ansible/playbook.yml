@@ -1,0 +1,76 @@
+- name: deploy management service using template
+  hosts: cloudera_manager
+  become: yes
+  tasks:
+
+  - name: fail if management service exists
+    uri:
+      url: "http://{{ groups['cloudera_manager'][0] }}:7180/api/v32/cm/service"
+      method: GET
+      user: admin
+      password: admin
+    register: mgmt_service_response
+    failed_when: mgmt_service_response['json'].type is defined
+
+  - name: create /api directory for json templates
+    file:
+      path: /api
+      state: directory
+      mode: 0755
+
+  - name: get host id
+    uri:
+      url: "http://{{ groups['cloudera_manager'][0] }}:7180/api/v32/hosts"
+      method: GET
+      user: admin
+      password: admin
+    register: request_hosts
+
+  - name: copy management service template
+    template:
+      src: "templates/{{ mgmt_template }}"
+      dest: /api/mgmt_service.json
+      mode: 0644
+
+  - name: slurp mgmt_service.json file
+    slurp:
+      src: /api/mgmt_service.json
+    register: mgmt_service
+
+  - name: add cloudera management service @{{ groups['cloudera_manager'][0] }}
+    uri:
+      url: "http://{{ groups['cloudera_manager'][0] }}:7180/api/v32/cm/service"
+      method: PUT
+      user: admin
+      password: admin
+      body: "{{ mgmt_service['content'] | b64decode }}"
+      body_format: json
+    register: mgmt_service_response
+
+  - name: print api response
+    debug:
+      msg: "{{ mgmt_service_response['json'] }}"
+
+  - name: start cloudera management service @{{ groups['cloudera_manager'][0] }}
+    uri:
+      url: "http://{{ groups['cloudera_manager'][0] }}:7180/api/v32/cm/service/commands/start"
+      method: POST
+      user: admin
+      password: admin
+    register: mgmt_start_response
+
+  - name: response start cloudera management service
+    debug:
+      msg: "{{ mgmt_start_response['json'] }}"
+
+  - name: check if cloudera manager management services are running (this will take about 30 - 60 seconds)
+    uri:
+      url: "http://{{ groups['cloudera_manager'][0] }}:7180/api/v32/cm/service/"
+      method: GET
+      user: admin
+      password: admin
+    register: mgmt_service_response
+    until: mgmt_service_response['json']['serviceState'] == "STARTED"
+    retries: 60
+    delay: 10
+

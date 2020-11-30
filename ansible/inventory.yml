@@ -1,0 +1,15 @@
+---
+all:
+  children:
+    cloudera_manager:
+      hosts:
+        <hostname>:
+          ansible_host: <ip_address>
+          ansible_user: <user>
+
+  vars:
+    cluster_name: cluster-1
+    mgmt_template: mgmt_service_free.json
+    amon_database_password: amon
+    rman_database_password: rman
+...

@@ -1,0 +1,23 @@
+{
+    "type": "MGMT",
+    "roles": [
+      { 
+          "type": "SERVICEMONITOR"
+      },
+      { 
+          "type": "HOSTMONITOR"
+      },
+      { 
+          "type": "EVENTSERVER"
+      },
+      { 
+          "type": "ALERTPUBLISHER"
+      },
+      { 
+          "type": "ACTIVITYMONITOR"
+      },
+      { 
+          "type": "REPORTSMANAGER"
+      }
+    ]
+}

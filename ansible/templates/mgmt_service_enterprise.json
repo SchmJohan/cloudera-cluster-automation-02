@@ -1,0 +1,117 @@
+{
+  "type": "MGMT",
+  "roles": [
+    {
+      "type": "SERVICEMONITOR",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      }
+    },
+    {
+      "type": "HOSTMONITOR",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      }
+    },
+    {
+      "type": "EVENTSERVER",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      }
+    },
+    {
+      "type": "ALERTPUBLISHER",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      }
+    },
+    {
+      "type": "ACTIVITYMONITOR",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      },
+      "roleConfigGroupRef": {
+        "roleConfigGroupName": "mgmt-ACTIVITYMONITOR-BASE"
+      }
+    },
+    {
+      "type": "REPORTSMANAGER",
+      "hostRef": {
+        "hostId": "{{ request_hosts['json']['items'][0]['hostId'] }}"
+      }
+    }
+  ],
+  "roleConfigGroups": [
+    {
+      "name": "mgmt-SERVICEMONITOR-BASE",
+      "roleType": "SERVICEMONITOR",
+      "base": true,
+      "config": {
+        "items": [
+          {
+            "name":"role_config_suppression_firehose_service_monitor_non_java_memory_role_validator",
+            "value":true
+          }
+        ]
+      }
+    },
+    {
+      "name": "mgmt-ACTIVITYMONITOR-BASE",
+      "roleType": "ACTIVITYMONITOR",
+      "base": true,
+      "config": {
+        "items": [
+          {
+            "name": "firehose_database_host",
+            "value": "{{ groups['cloudera_manager'][0] }}",
+            "sensitive": false
+          },
+          {
+            "name": "firehose_database_name",
+            "value": "amon",
+            "sensitive": false
+          },
+          {
+            "name": "firehose_database_password",
+            "value": "{{ amon_database_password }}",
+            "sensitive": true
+          },
+          {
+            "name": "firehose_database_user",
+            "value": "amon",
+            "sensitive": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "mgmt-REPORTSMANAGER-BASE",
+      "roleType": "REPORTSMANAGER",
+      "base": true,
+      "config": {
+        "items": [
+          {
+            "name": "headlamp_database_host",
+            "value": "{{ groups['cloudera_manager'][0] }}",
+            "sensitive": false
+          },
+          {
+            "name": "headlamp_database_name",
+            "value": "rman",
+            "sensitive": false
+          },
+          {
+            "name": "headlamp_database_password",
+            "value": "{{ rman_database_password }}",
+            "sensitive": true
+          },
+          {
+            "name": "headlamp_database_user",
+            "value": "rman",
+            "sensitive": false
+          }
+        ]
+      }
+    }
+  ]
+}
